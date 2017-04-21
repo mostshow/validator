@@ -1,6 +1,6 @@
 # validate.js
 
-validate.js是一个轻量级验证库
+validate是一个轻量级javascript验证库
 
 ## Features
 
