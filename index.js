@@ -1,28 +1,29 @@
 
 
-var $ = require("jquery");
 
 ;(function(window, document, undefined){
 
+    var $ = document.querySelectorAll;
     var defaults = {
         messages: {
             required: '%s不能为空.',
             matches: '两次密码输入不一致.',
-            sixNum: '%s为6位阿拉伯数字.'
+            sixNum: '%s为6位阿拉伯数字.',
+            email: '%s格式错误.'
         },
         callback: function(errors) {
 
         },
         errHandle: function(field,errorObject){
 
-            var errHtml = '<i class="error-icon"></i>%s'.replace('%s', errorObject.message)
             var $el = field.element;
-            $el.closest('.line').removeClass('succeed').addClass('error').find('.errorTips').html(errHtml)
+            console.log(field)
+            console.log(errorObject)
         },
         sucessHandle: function(field){
 
             var $el = field.element;
-            $el.closest('.line').removeClass('error').addClass('succeed')
+            console.log(field)
         }
 
     };
@@ -37,18 +38,6 @@ var $ = require("jquery");
 
     Validator.prototype = {
 
-        // var passwordValidator = validator('.item-wrap', [{
-        //     name: 'password',
-        //     display: '密码',
-        //     rules: 'required'
-
-        // },{
-        //     name: 'confirmPassword',
-        //     display: '确认密码',
-        //     rules: 'required|matches[password]'
-
-        // }
-        // ])
         init: function(node, fields, options){
 
             var options = options || {}
@@ -58,7 +47,7 @@ var $ = require("jquery");
 
             this.errors = [];
             this.fields = {};
-            this.$node = $(node);
+            this.$node = document.querySelectorAll(node)[0];
             this._id = 10000;
 
             for (var i = 0, fieldLength = fields.length; i < fieldLength; i++) {
@@ -98,29 +87,35 @@ var $ = require("jquery");
             },
             matches: {
                 validate: function(field, matchName) {
-                    var el = this.$node.find('input[name="'+matchName+'"]');
+                    var el = this.$node.querySelectorAll('input[name="'+matchName+'"]')[0]
 
                     if (el) {
-                        return field.value === el.val();
+                        return field.value === el.value;
                     }
 
                     return false;
+                }
+            },
+            email: {
+                validate: function(field){
+                    return /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/.test(field.value);
                 }
             }
         },
 
         _addField: function(field, nameValue)  {
-            var $el = this.$node.find('input[name="'+nameValue+'"]');
+            var $el = this.$node.querySelectorAll('input[name="'+nameValue+'"]')[0];
+            if(!$el)return;
             this.fields[nameValue] = {
                 name: nameValue,
                 display: field.display || nameValue,
                 rules: field.rules,
                 depends: field.depends,
-                id: this.attributeValue($el[0], 'id')||this._id++,
+                id: this.attributeValue($el, 'id')||this._id++,
                 element: $el,
-                type: this.attributeValue($el[0], 'type'),
-                value: this.attributeValue($el[0], 'value'),
-                checked: this.attributeValue($el[0], 'checked')
+                type: this.attributeValue($el, 'type'),
+                value: this.attributeValue($el, 'value'),
+                checked: this.attributeValue($el, 'checked')
             };
         },
 
@@ -152,11 +147,11 @@ var $ = require("jquery");
 
         delegate: function(field) {
             var ctx = this, $el = field.element;
-            $el.on(' focusout keyup',function(evt){//focusin
+            $el.addEventListener(' focusout keyup',function(evt){//focusin
 
                 ctx._removeErr(field)
-                field.value = ctx.attributeValue($el[0], 'value');
-                field.checked = ctx.attributeValue($el[0], 'checked');
+                field.value = ctx.attributeValue($el, 'value');
+                field.checked = ctx.attributeValue($el, 'checked');
                 ctx._validateField(field);
 
             })
@@ -170,8 +165,8 @@ var $ = require("jquery");
                 if(this.fields.hasOwnProperty(key)){
                     var field = this.fields[key] || {};
                     $el = field.element;
-                    field.value = this.attributeValue($el[0], 'value');
-                    field.checked = this.attributeValue($el[0], 'checked');
+                    field.value = this.attributeValue($el, 'value');
+                    field.checked = this.attributeValue($el, 'checked');
 
                     this._validateField(field);
                 }
