@@ -184,7 +184,7 @@
 
         _validateField: function(field){
             //todo 非必选字段验证
-            var i, j,rules = field.rules.split('|'), passFlag = true
+            var i, j,rules = field.rules.split('|')
             ,indexOfRequired = field.rules.indexOf('required')
             ,isEmpty = (!field.value || field.value === '' || field.value === undefined)
             ,errors = this.errors;
@@ -210,7 +210,6 @@
                 if (failed) {
                     var source = checker.instructions || defaults.messages[method],
                         message = '';
-                        passFlag = false;
                         if (source) {
                             message = source.replace('%s', field.display);
 
