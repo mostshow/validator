@@ -201,7 +201,7 @@
                 if(!checker){
                     throw{
                         name:'ValidationError',
-                        messages:'No handler to validate type '+ type
+                        messages:'No handler to validate type '
                     };
                 }
                 if (!checker.validate.apply(this, [field, param])) {
