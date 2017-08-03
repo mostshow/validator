@@ -147,15 +147,33 @@
 
         delegate: function(field) {
             var ctx = this, $el = field.element;
-            $el.addEventListener(' focusout keyup',function(evt){//focusin
 
+            $el.addEventListener(' focusout keyup',throttle(function(){
                 ctx._removeErr(field)
-                field.value = ctx.attributeValue($el, 'value');
-                field.checked = ctx.attributeValue($el, 'checked');
+                field.value = ctx.attributeValue(this, 'value');
+                field.checked = ctx.attributeValue(this, 'checked');
                 ctx._validateField(field);
 
-            })
+            }, 300, 100));
+            function throttle(method , duration ,delay ){
+                var timer = null, begin = new Date();
+                
+                return function(){
+                    var context = this, 
+                        args = arguments, 
+                        current = new Date();
+                    clearTimeout(timer);
 
+                    if(current-begin >= duration){
+                         method.apply(context , args);
+                         begin = current;
+                    }else{  
+                        timer = setTimeout(function(){
+                            method.apply(context , args);
+                        } , delay);
+                    }
+                }
+            }      
         },
 
         validate: function(){
